@@ -54,6 +54,15 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         await DbContext.SaveChangesAsync();
     }
 
+    public async Task DeleteByIdAsync(TKey id)
+    {
+        var entity = new TEntity { Id = id };
+
+        DbContext.Set<TEntity>().Remove(entity);
+
+        await DbContext.SaveChangesAsync();
+    }
+
     public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
         Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
     {

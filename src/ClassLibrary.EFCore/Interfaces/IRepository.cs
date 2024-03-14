@@ -15,6 +15,8 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
 
     Task DeleteAsync(TEntity entity);
 
+    Task DeleteByIdAsync(TKey id);
+
     Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
         Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType,
         int pageIndex, int pageSize);
