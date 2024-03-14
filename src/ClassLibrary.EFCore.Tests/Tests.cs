@@ -115,6 +115,23 @@ public class Tests : InMemoryDbContext
     }
 
     [Fact]
+    public void DeleteByIdEntity()
+    {
+        using var dbContext = GetDbContext();
+        Repository<Person, int> repository = new(dbContext);
+
+        dbContext.Database.EnsureDeletedAsync();
+        dbContext.Database.EnsureCreatedAsync();
+
+        repository?.DeleteByIdAsync(4);
+
+        var entities = repository?.GetAllAsync();
+
+        Assert.NotNull(entities);
+        Assert.Equal(9, entities?.Result.Count);
+    }
+
+    [Fact]
     public void GetPaginatedEntities()
     {
         using var dbContext = GetDbContext();
