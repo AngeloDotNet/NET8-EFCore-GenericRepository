@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-
-namespace ClassLibrary.EFCore.Interfaces;
+﻿namespace ClassLibrary.EFCore.Interfaces;
 
 public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
 {

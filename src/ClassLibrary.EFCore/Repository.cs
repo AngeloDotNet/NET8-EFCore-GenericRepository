@@ -1,19 +1,11 @@
-﻿using ClassLibrary.EFCore.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-using System.Threading;
-
-namespace ClassLibrary.EFCore;
+﻿namespace ClassLibrary.EFCore;
 
 public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
 {
     public DbContext DbContext { get; } = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     public async Task<List<TEntity>> GetAllAsync()
-    {
-        return await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
-    }
+        => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
 
     public async Task<TEntity?> GetByIdAsync(TKey id)
     {
@@ -80,27 +72,17 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
 
         if (orderBy != null)
         {
-            switch (orderType)
+            query = orderType switch
             {
-                case "ASC":
-                    query = query.OrderBy(orderBy);
-                    break;
-
-                case "DESC":
-                    query = query.OrderByDescending(orderBy);
-                    break;
-
-                default:
-                    query = query.OrderBy(orderBy);
-                    break;
-            }
+                "ASC" => query.OrderBy(orderBy),
+                "DESC" => query.OrderByDescending(orderBy),
+                _ => query.OrderBy(orderBy),
+            };
         }
 
         if (pageIndex != 0 && pageSize != 0)
         {
-            var skip = (pageIndex - 1) * pageSize;
-
-            query = query.Skip(skip).Take(pageSize);
+            query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
         }
 
         return query.AsNoTracking().ToListAsync();
