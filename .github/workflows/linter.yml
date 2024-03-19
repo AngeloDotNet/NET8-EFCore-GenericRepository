@@ -1,0 +1,31 @@
+name: Lint Code Base
+
+on:
+  push:
+    branches-ignore: [ main ]
+    paths: [ 'src/ClassLibrary.EFCore' ]
+  #pull_request:   
+  #  branches: [ main, develop ]
+  #  paths: [ 'src/ClassLibrary.EFCore' ]    
+  workflow_dispatch:
+  
+jobs:
+  build:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          LINTER_RULES_PATH: '.'
+          EDITORCONFIG_FILE_NAME: '.editorconfig'
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CSHARP: true
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
