@@ -8,7 +8,7 @@ on:
       
 env:
   NET_VERSION: '8.x'
-  PROJECT_NAME: ClassLibrary.EFCore
+  PROJECT_NAME: src/ClassLibrary.EFCore
   PROJECT_FILE: ClassLibrary.EFCore.csproj
   TAG_NAME: EFCore
   RELEASE_NAME: ClassLibrary.EFCore
