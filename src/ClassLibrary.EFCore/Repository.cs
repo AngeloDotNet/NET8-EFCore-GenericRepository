@@ -4,9 +4,16 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
 {
     public DbContext DbContext { get; } = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
+    /// <summary>
+    /// Gets the list of entities
+    /// </summary>
     public async Task<List<TEntity>> GetAllAsync()
         => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
 
+    /// <summary>
+    /// Gets the single entity based on the given ID
+    /// </summary>
+    /// <param name="id"></param>
     public async Task<TEntity?> GetByIdAsync(TKey id)
     {
         var entity = await DbContext.Set<TEntity>().FindAsync(id);
@@ -21,6 +28,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         return entity;
     }
 
+    /// <summary>
+    /// Creating a new entity
+    /// </summary>
+    /// <param name="entity"></param>
     public async Task CreateAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Add(entity);
@@ -30,6 +41,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         DbContext.Entry(entity).State = EntityState.Detached;
     }
 
+    /// <summary>
+    /// Updating a pre-existing entity
+    /// </summary>
+    /// <param name="entity"></param>
     public async Task UpdateAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Update(entity);
@@ -39,6 +54,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         DbContext.Entry(entity).State = EntityState.Detached;
     }
 
+    /// <summary>
+    /// Deletion of an entity
+    /// </summary>
+    /// <param name="entity"></param>
     public async Task DeleteAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Remove(entity);
@@ -46,6 +65,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         await DbContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Deletion of an entity based on the given ID
+    /// </summary>
+    /// <param name="id"></param>
     public async Task DeleteByIdAsync(TKey id)
     {
         var entity = new TEntity { Id = id };
@@ -55,6 +78,15 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         await DbContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Gets the list of entities and allows you to apply filters and pagination
+    /// </summary>
+    /// <param name="includes"></param>
+    /// <param name="conditionWhere"></param>
+    /// <param name="orderBy"></param>
+    /// <param name="orderType"></param>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
     public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
         Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
     {
