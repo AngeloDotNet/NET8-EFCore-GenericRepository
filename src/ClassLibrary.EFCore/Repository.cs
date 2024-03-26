@@ -1,19 +1,29 @@
 ﻿namespace ClassLibrary.EFCore;
 
+/// <summary>
+/// Repository class for Entity Framework Core operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity.</typeparam>
+/// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
 public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
 {
+    /// <summary>
+    /// Gets the DbContext.
+    /// </summary>
     public DbContext DbContext { get; } = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     /// <summary>
-    /// Gets the list of entities
+    /// Asynchronously gets all entities.
     /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities.</returns>
     public async Task<List<TEntity>> GetAllAsync()
         => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
 
     /// <summary>
-    /// Gets the single entity based on the given ID
+    /// Asynchronously gets an entity by its id.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">The id of the entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the entity if found; otherwise, null.</returns>
     public async Task<TEntity?> GetByIdAsync(TKey id)
     {
         var entity = await DbContext.Set<TEntity>().FindAsync(id);
@@ -29,9 +39,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Creating a new entity
+    /// Asynchronously creates a new entity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="entity">The entity to create.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task CreateAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Add(entity);
@@ -42,9 +53,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Updating a pre-existing entity
+    /// Asynchronously updates an existing entity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="entity">The entity to update.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task UpdateAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Update(entity);
@@ -55,9 +67,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Deletion of an entity
+    /// Asynchronously deletes an existing entity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="entity">The entity to delete.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task DeleteAsync(TEntity entity)
     {
         DbContext.Set<TEntity>().Remove(entity);
@@ -66,9 +79,10 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Deletion of an entity based on the given ID
+    /// Asynchronously deletes an entity by its id.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">The id of the entity to delete.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task DeleteByIdAsync(TKey id)
     {
         var entity = new TEntity { Id = id };
@@ -79,16 +93,17 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Gets the list of entities and allows you to apply filters and pagination
+    /// Asynchronously gets a paginated list of entities.
     /// </summary>
-    /// <param name="includes"></param>
-    /// <param name="conditionWhere"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderType"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
+    /// <param name="includes">A function to include related entities.</param>
+    /// <param name="conditionWhere">A function to filter the entities.</param>
+    /// <param name="orderBy">A function to sort the entities.</param>
+    /// <param name="orderType">The type of the order ("ASC" for ascending, "DESC" for descending).</param>
+    /// <param name="pageIndex">The index of the page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities.</returns>
     public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
-        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
+    Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
     {
         IQueryable<TEntity> query = DbContext.Set<TEntity>();
 
