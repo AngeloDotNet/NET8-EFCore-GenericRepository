@@ -29,16 +29,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.NET_VERSION }}
-     
-    #- name: Install dependencies
-      #run: dotnet restore
-
-    #- name: Build
-      #run: dotnet build --configuration Release --no-restore
-        
-    - name: Test
-      run: dotnet test src/ClassLibrary.EFCore.Tests/bin/Debug/net8.0/ClassLibrary.EFCore.Tests.dll --verbosity normal
-      #run: dotnet test --no-build --verbosity normal
 
     - name: Nerdbank.GitVersioning 
       uses: dotnet/nbgv@v0.4
