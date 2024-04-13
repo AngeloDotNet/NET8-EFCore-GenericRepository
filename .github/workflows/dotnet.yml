@@ -37,7 +37,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
         
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test src/ClassLibrary.EFCore.Tests/bin/Debug/net8.0/ClassLibrary.EFCore.Tests.dll --no-build --verbosity normal
+      #run: dotnet test --no-build --verbosity normal
 
     - name: Nerdbank.GitVersioning 
       uses: dotnet/nbgv@v0.4
