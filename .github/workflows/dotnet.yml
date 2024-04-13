@@ -30,11 +30,11 @@ jobs:
       with:
         dotnet-version: ${{ env.NET_VERSION }}
      
-    - name: Install dependencies
-      run: dotnet restore
+    #- name: Install dependencies
+      #run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+    #- name: Build
+      #run: dotnet build --configuration Release --no-restore
         
     - name: Test
       run: dotnet test src/ClassLibrary.EFCore.Tests/bin/Debug/net8.0/ClassLibrary.EFCore.Tests.dll --no-build --verbosity normal
