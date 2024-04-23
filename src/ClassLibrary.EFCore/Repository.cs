@@ -20,6 +20,14 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
         => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
 
     /// <summary>
+    /// Asynchronously gets all entities that satisfy the given predicate.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities that satisfy the condition.</returns>
+    public async Task<List<TEntity>> GetAllEntitiesAsync(Func<TEntity, bool> predicate)
+        => await Task.FromResult(DbContext.Set<TEntity>().AsNoTracking().Where(predicate).ToList());
+
+    /// <summary>
     /// Asynchronously gets an entity by its id.
     /// </summary>
     /// <param name="id">The id of the entity.</param>
