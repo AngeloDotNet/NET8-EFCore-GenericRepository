@@ -3,11 +3,10 @@ name: Build and Pack
 on:
   push:
     branches: [ main ]
-    paths: [ 'src/ClassLibrary.EFCore' ]
+    paths: [ 'src/ClassLibrary.EFCore/**' ]
   workflow_dispatch:
       
 env:
-  #PACKAGE_PATH: './published'
   NET_VERSION: '8.x'
   PROJECT_NAME: src/ClassLibrary.EFCore
   PROJECT_FILE: ClassLibrary.EFCore.csproj
@@ -38,15 +37,6 @@ jobs:
 
     - name: Package
       run: dotnet pack -c Release -o . '${{ env.PROJECT_NAME }}/${{ env.PROJECT_FILE }}' -p:Version=${{ steps.gitversion.outputs.SemVer }}
-      
-    #- name: Publish app for deploy
-    #  run: dotnet publish --configuration Release --no-build --output ${{ env.PACKAGE_PATH }}
-
-    #- name: Publish Artifacts
-    #  uses: actions/upload-artifact@v4
-    #  with:
-    #    name: webapp
-    #    path: ${{ env.PACKAGE_PATH }}
 
     - name: Publish on NuGet
       run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
