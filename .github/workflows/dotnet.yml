@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
       
 env:
-  PACKAGE_PATH: './published'
+  #PACKAGE_PATH: './published'
   NET_VERSION: '8.x'
   PROJECT_NAME: src/ClassLibrary.EFCore
   PROJECT_FILE: ClassLibrary.EFCore.csproj
@@ -29,15 +29,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.NET_VERSION }}
-     
-    - name: Install dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-        
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
 
     - name: Nerdbank.GitVersioning 
       uses: dotnet/nbgv@v0.4
@@ -48,14 +39,14 @@ jobs:
     - name: Package
       run: dotnet pack -c Release -o . '${{ env.PROJECT_NAME }}/${{ env.PROJECT_FILE }}' -p:Version=${{ steps.gitversion.outputs.SemVer }}
       
-    - name: Publish app for deploy
-      run: dotnet publish --configuration Release --no-build --output ${{ env.PACKAGE_PATH }}
+    #- name: Publish app for deploy
+    #  run: dotnet publish --configuration Release --no-build --output ${{ env.PACKAGE_PATH }}
 
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: webapp
-        path: ${{ env.PACKAGE_PATH }}
+    #- name: Publish Artifacts
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: webapp
+    #    path: ${{ env.PACKAGE_PATH }}
 
     - name: Publish on NuGet
       run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
