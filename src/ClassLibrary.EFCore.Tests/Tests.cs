@@ -21,6 +21,21 @@ public class Tests : InMemoryDbContext
     }
 
     [Fact]
+    public void GetAllEntitiesWithPredicate()
+    {
+        using var dbContext = GetDbContext();
+        Repository<Person, int> repository = new(dbContext);
+
+        dbContext.Database.EnsureDeletedAsync();
+        dbContext.Database.EnsureCreatedAsync();
+
+        var entities = repository.GetAllEntitiesAsync(predicate: x => x.Id is >= 3 and <= 8);
+
+        Assert.Equal(6, entities?.Result.Count);
+        Assert.NotNull(entities);
+    }
+
+    [Fact]
     public void GetEntityById()
     {
         using var dbContext = GetDbContext();
@@ -46,7 +61,7 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(30).Result;
+        var entity = repository.GetByIdAsync(30)?.Result;
 
         Assert.Null(entity);
     }
@@ -83,7 +98,7 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(2).Result;
+        var entity = repository.GetByIdAsync(2)?.Result;
 
         entity!.Nome = "Nome2-bis";
         entity!.Cognome = "Cognome2-bis";
