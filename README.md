@@ -49,6 +49,9 @@ public interface IYourEntityService
     Task UpdateAsync(YourEntity entity);
     Task DeleteAsync(YourEntity entity);
 
+    //Alternative method for extracting all records
+    Task<IEnumerable<TEntity>> GetAllEntitiesAsync(Func<TEntity, bool> predicate)
+
     //Alternative method for deleting
     Task DeleteByIdAsync(int id);
 
@@ -96,6 +99,12 @@ public class YourEntityService : IYourEntityService
     public async Task DeleteAsync(YourEntity entity)
     {
         await _repository.DeleteAsync(entity);
+    }
+
+    //Alternative method for extracting all records
+    public async Task<IEnumerable<YourEntity>> GetAllEntitiesAsync(Func<YourEntity, bool> predicate)
+    {
+        return await _repository.GetAllEntitiesAsync(predicate);
     }
 
     //Alternative method for deleting
