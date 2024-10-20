@@ -1,4 +1,4 @@
-name: Build and Pack
+name: Build, Test and Pack
 
 on:
   push:
@@ -28,6 +28,12 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.NET_VERSION }}
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+      
+    - name: Run unit tests
+      run: dotnet test
 
     - name: Nerdbank.GitVersioning 
       uses: dotnet/nbgv@v0.4
