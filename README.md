@@ -50,17 +50,17 @@ public interface IYourEntityService
     Task DeleteAsync(YourEntity entity);
 
     //Alternative method for extracting all records
-    Task<IEnumerable<TEntity>> GetAllEntitiesAsync(Func<TEntity, bool> predicate)
+    Task<IEnumerable<YourEntity>> GetAllEntitiesAsync(Func<YourEntity, bool> predicate)
 
     //Alternative method for deleting
     Task DeleteByIdAsync(int id);
 
     //Optional method
-    Task<List<PersonEntity>> GetPaginatedAsync(Func<IQueryable<PersonEntity>,
-        IIncludableQueryable<PersonEntity, object>> includes,
-        Expression<Func<PersonEntity, bool>> conditionWhere,
-        Expression<Func<PersonEntity, dynamic>> orderBy,
-        string orderType, int pageIndex, int pageSize);
+    Task<List<YourEntity>> GetPaginatedAsync(Func<IQueryable<YourEntity>,
+        IIncludableQueryable<YourEntity, object>> includes,
+        Expression<Func<YourEntity, bool>> conditionWhere,
+        Expression<Func<YourEntity, dynamic>> orderBy,
+        bool ascending, int pageIndex, int pageSize);
 }
 ```
 
@@ -113,12 +113,14 @@ public class YourEntityService : IYourEntityService
         await _repository.DeleteByIdAsync(id);
     }
 
-    //Optional method
-    public async Task<List<YourEntity>> GetPaginatedAsync(Func<IQueryable<YourEntity>,
+    //Optional method for pagination
+    //If ascending is passed to true, the list is sorted in ascending order.
+    //If ascending is passed to false, the list is sorted in descending order.
+    public Task<List<YourEntity>> GetPaginatedAsync(Func<IQueryable<YourEntity>,
         IIncludableQueryable<YourEntity, object>> includes, Expression<Func<YourEntity, bool>> conditionWhere,
-        Expression<Func<YourEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
+        Expression<Func<YourEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize)
     {
-        return await _repository.GetPaginatedAsync(includes, conditionWhere, orderBy, orderType, pageIndex, pageSize);
+        return await _repository.GetPaginatedAsync(includes, conditionWhere, orderBy, ascending, pageIndex, pageSize);
     }
 }
 ```
