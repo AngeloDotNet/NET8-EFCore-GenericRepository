@@ -155,7 +155,7 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, "ASC", 2, 5);
+        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
 
         Assert.NotNull(entities);
         Assert.Equal(5, entities?.Result.Count);
@@ -171,7 +171,7 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, "ASC", 2, 5);
+        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
 
         Assert.NotNull(entities);
         Assert.Equal(5, entities?.Result.Count);
@@ -187,28 +187,11 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, "ASC", 1, 5);
+        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, true, 1, 5);
 
         Assert.NotNull(entities);
         Assert.Equal(5, entities?.Result.Count);
         Assert.Contains(entities!.Result, x => x.Id == 3);
-    }
-
-    [Fact]
-    public void GetPaginatedEntitiesWithoutOrderType()
-    {
-        using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
-
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
-
-        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, null, 2, 5);
-
-        Assert.NotNull(entities);
-        Assert.Equal(5, entities?.Result.Count);
-        Assert.Equal(6, Assert.IsType<Person>(entities?.Result.First()).Id);
-        Assert.Contains(entities!.Result, x => x.Id == 8);
     }
 
     [Fact]
@@ -220,7 +203,7 @@ public class Tests : InMemoryDbContext
         dbContext.Database.EnsureDeletedAsync();
         dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, "DESC", 1, 5);
+        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, false, 1, 5);
 
         Assert.NotNull(entities);
         Assert.Equal(5, entities?.Result.Count);
