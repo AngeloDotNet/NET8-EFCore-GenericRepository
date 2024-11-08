@@ -1,4 +1,6 @@
-﻿namespace ClassLibrary.EFCore;
+﻿using ClassLibrary.EFCore.Extensions;
+
+namespace ClassLibrary.EFCore;
 
 /// <summary>
 /// Repository class for Entity Framework Core operations.
@@ -104,14 +106,14 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     /// Asynchronously gets a paginated list of entities.
     /// </summary>
     /// <param name="includes">A function to include related entities.</param>
-    /// <param name="conditionWhere">A function to filter the entities.</param>
-    /// <param name="orderBy">A function to sort the entities.</param>
-    /// <param name="orderType">The type of the order ("ASC" for ascending, "DESC" for descending).</param>
-    /// <param name="pageIndex">The index of the page.</param>
-    /// <param name="pageSize">The size of the page.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities.</returns>
+    /// <param name="conditionWhere">A condition to filter the entities.</param>
+    /// <param name="orderBy">A function to order the entities.</param>
+    /// <param name="ascending">A boolean indicating whether the order is ascending.</param>
+    /// <param name="pageIndex">The index of the page to retrieve.</param>
+    /// <param name="pageSize">The size of the page to retrieve.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of paginated entities.</returns>
     public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
-    Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType, int pageIndex, int pageSize)
+        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize)
     {
         IQueryable<TEntity> query = DbContext.Set<TEntity>();
 
@@ -127,19 +129,9 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
 
         if (orderBy != null)
         {
-            query = orderType switch
-            {
-                "ASC" => query.OrderBy(orderBy),
-                "DESC" => query.OrderByDescending(orderBy),
-                _ => query.OrderBy(orderBy),
-            };
+            query = query.OrderedByAscending(orderBy, ascending);
         }
 
-        if (pageIndex != 0 && pageSize != 0)
-        {
-            query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-        }
-
-        return query.AsNoTracking().ToListAsync();
+        return query.Page(pageIndex, pageSize).AsNoTracking().ToListAsync();
     }
 }

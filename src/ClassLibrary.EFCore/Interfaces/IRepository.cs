@@ -56,16 +56,15 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     Task DeleteByIdAsync(TKey id);
 
     /// <summary>
-    /// Asynchronously gets a paginated list of entities.
+    /// Asynchronously gets a paginated list of entities that satisfy the given conditions.
     /// </summary>
     /// <param name="includes">A function to include related entities.</param>
-    /// <param name="conditionWhere">A condition to filter the entities.</param>
-    /// <param name="orderBy">A function to order the entities.</param>
-    /// <param name="orderType">The type of the order.</param>
-    /// <param name="pageIndex">The index of the page.</param>
-    /// <param name="pageSize">The size of the page.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities.</returns>
-    Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
-        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, string orderType,
-        int pageIndex, int pageSize);
+    /// <param name="conditionWhere">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order the elements.</param>
+    /// <param name="ascending">A boolean indicating whether the order is ascending.</param>
+    /// <param name="pageIndex">The index of the page to retrieve.</param>
+    /// <param name="pageSize">The size of the page to retrieve.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities that satisfy the conditions.</returns>
+    public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
+        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize);
 }
