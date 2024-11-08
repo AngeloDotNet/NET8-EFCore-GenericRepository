@@ -7,73 +7,73 @@ namespace ClassLibrary.EFCore.Tests;
 public class Tests : InMemoryDbContext
 {
     [Fact]
-    public void GetAllEntities()
+    public async Task GetAllEntities()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetAllAsync();
+        var entities = await repository.GetAllAsync();
 
         Assert.NotNull(entities);
     }
 
     [Fact]
-    public void GetAllEntitiesWithPredicate()
+    public async Task GetAllEntitiesWithPredicateAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetAllEntitiesAsync(predicate: x => x.Id is >= 3 and <= 8);
+        var entities = await repository.GetAllEntitiesAsync(predicate: x => x.Id is >= 3 and <= 8);
 
-        Assert.Equal(6, entities?.Result.Count);
+        Assert.Equal(6, entities.Count);
         Assert.NotNull(entities);
     }
 
     [Fact]
-    public void GetEntityById()
+    public async Task GetEntityByIdAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(2);
+        var entity = await repository.GetByIdAsync(2);
 
         Assert.NotNull(entity);
-        Assert.Equal(2, Assert.IsType<Person>(entity?.Result).Id);
-        Assert.Equal("Nome2", Assert.IsType<Person>(entity?.Result).Nome);
-        Assert.Equal("Cognome2", Assert.IsType<Person>(entity?.Result).Cognome);
+        Assert.Equal(2, Assert.IsType<Person>(entity).Id);
+        Assert.Equal("Nome2", Assert.IsType<Person>(entity).Nome);
+        Assert.Equal("Cognome2", Assert.IsType<Person>(entity).Cognome);
     }
 
     [Fact]
-    public void GetEntityByIdNotFound()
+    public async Task GetEntityByIdNotFoundAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(30)?.Result;
+        var entity = await repository.GetByIdAsync(30);
 
         Assert.Null(entity);
     }
 
     [Fact]
-    public void CreateEntity()
+    public async Task CreateEntityAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
         var entity = new Person
         {
@@ -81,7 +81,7 @@ public class Tests : InMemoryDbContext
             Cognome = "Cognome11"
         };
 
-        repository?.CreateAsync(entity);
+        await repository.CreateAsync(entity);
 
         Assert.NotNull(entity);
         Assert.Equal(11, entity.Id);
@@ -90,20 +90,20 @@ public class Tests : InMemoryDbContext
     }
 
     [Fact]
-    public void UpdateEntity()
+    public async Task UpdateEntityAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(2)?.Result;
+        var entity = await repository.GetByIdAsync(2);
 
-        entity!.Nome = "Nome2-bis";
-        entity!.Cognome = "Cognome2-bis";
+        entity.Nome = "Nome2-bis";
+        entity.Cognome = "Cognome2-bis";
 
-        repository?.UpdateAsync(entity);
+        await repository.UpdateAsync(entity);
 
         Assert.NotNull(entity);
         Assert.Equal(2, entity.Id);
@@ -112,102 +112,102 @@ public class Tests : InMemoryDbContext
     }
 
     [Fact]
-    public void DeleteEntity()
+    public async Task DeleteEntityAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entity = repository.GetByIdAsync(4)?.Result;
-        repository?.DeleteAsync(entity!);
+        var entity = await repository.GetByIdAsync(4);
+        await repository.DeleteAsync(entity!);
 
-        var entities = repository?.GetAllAsync();
+        var entities = await repository.GetAllAsync();
 
         Assert.NotNull(entities);
-        Assert.Equal(9, entities?.Result.Count);
+        Assert.Equal(9, entities.Count);
     }
 
     [Fact]
-    public void DeleteByIdEntity()
+    public async Task DeleteByIdEntityAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        repository?.DeleteByIdAsync(4);
+        await repository.DeleteByIdAsync(4);
 
-        var entities = repository?.GetAllAsync();
+        var entities = await repository.GetAllAsync();
 
         Assert.NotNull(entities);
-        Assert.Equal(9, entities?.Result.Count);
+        Assert.Equal(9, entities.Count);
     }
 
     [Fact]
-    public void GetPaginatedEntities()
+    public async Task GetPaginatedEntitiesAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
+        var entities = await repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
 
         Assert.NotNull(entities);
-        Assert.Equal(5, entities?.Result.Count);
-        Assert.Contains(entities!.Result, x => x.Id == 8);
+        Assert.Equal(5, entities.Count);
+        Assert.Contains(entities, x => x.Id == 8);
     }
 
     [Fact]
-    public void GetPaginatedEntitiesWithoutInclude()
+    public async Task GetPaginatedEntitiesWithoutIncludeAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
+        var entities = await repository.GetPaginatedAsync(null!, x => x.Id <= 10, x => x.Id, true, 2, 5);
 
         Assert.NotNull(entities);
-        Assert.Equal(5, entities?.Result.Count);
-        Assert.Contains(entities!.Result, x => x.Id == 8);
+        Assert.Equal(5, entities.Count);
+        Assert.Contains(entities, x => x.Id == 8);
     }
 
     [Fact]
-    public void GetPaginatedEntitiesWithoutWhere()
+    public async Task GetPaginatedEntitiesWithoutWhereAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, true, 1, 5);
+        var entities = await repository.GetPaginatedAsync(null!, null!, x => x.Id, true, 1, 5);
 
         Assert.NotNull(entities);
-        Assert.Equal(5, entities?.Result.Count);
-        Assert.Contains(entities!.Result, x => x.Id == 3);
+        Assert.Equal(5, entities.Count);
+        Assert.Contains(entities, x => x.Id == 3);
     }
 
     [Fact]
-    public void GetPaginatedEntitiesDescendingOrderType()
+    public async Task GetPaginatedEntitiesDescendingOrderTypeAsync()
     {
         using var dbContext = GetDbContext();
-        Repository<Person, int> repository = new(dbContext);
+        var repository = new Repository<Person, int>(dbContext);
 
-        dbContext.Database.EnsureDeletedAsync();
-        dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        var entities = repository.GetPaginatedAsync(null!, null!, x => x.Id, false, 1, 5);
+        var entities = await repository.GetPaginatedAsync(null!, null!, x => x.Id, false, 1, 5);
 
         Assert.NotNull(entities);
-        Assert.Equal(5, entities?.Result.Count);
-        Assert.Equal(10, Assert.IsType<Person>(entities?.Result.First()).Id);
-        Assert.Contains(entities!.Result, x => x.Id == 8);
+        Assert.Equal(5, entities.Count);
+        Assert.Equal(10, Assert.IsType<Person>(entities.First()).Id);
+        Assert.Contains(entities, x => x.Id == 8);
     }
 }
