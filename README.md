@@ -27,6 +27,10 @@ Alternatively the generic version of the repository can be registered as follows
 services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 ```
 
+## Important
+
+In this README the INT type is used as ID type, but it is also possible to use the GUID type, making the appropriate corrections later.
+
 ## Example entity
 
 ```csharp
