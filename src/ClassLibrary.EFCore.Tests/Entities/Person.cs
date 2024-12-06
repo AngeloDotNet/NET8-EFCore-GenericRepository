@@ -5,6 +5,8 @@ namespace ClassLibrary.EFCore.Tests.Entities;
 public class Person : IEntity<int>
 {
     public int Id { get; set; }
-    public string Cognome { get; set; } = string.Empty;
-    public string Nome { get; set; } = string.Empty;
+    public string Cognome { get; set; } = null!;
+    public string Nome { get; set; } = null!;
+    public int IndirizzoId { get; set; }
+    public Address Indirizzo { get; set; } = default!;
 }
