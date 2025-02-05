@@ -112,11 +112,13 @@ public class YourEntityService : IYourEntityService
     }
 
     //Optional method for pagination
+    //For optional lambdas read the comments of the GetAllAsync method
+    //A simple way to retrieve data is to call the GetAllAsync() method
+    //After retrieving the data, it will be possible to invoke the GetPaginatedAsync() method to have a paginated list
+    //Example: var query = await repository.GetAllAsync(); var result = await repository.GetPaginatedAsync(query, 1, 10);
     public async Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize)
     {
-        //For optional lambdas read the comments of the GetAllAsync method
-        var query = await repository.GetAllAsync();
-        var result = await repository.GetPaginatedAsync(query, 2, 5);
+        var result = await repository.GetPaginatedAsync(query, pageNumber, pageSize);
 
         return result;
     }
