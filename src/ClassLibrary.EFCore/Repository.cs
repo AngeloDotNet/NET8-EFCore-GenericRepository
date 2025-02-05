@@ -1,6 +1,4 @@
-﻿using ClassLibrary.EFCore.Extensions;
-
-namespace ClassLibrary.EFCore;
+﻿namespace ClassLibrary.EFCore;
 
 public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
 {
@@ -10,19 +8,38 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     public DbContext DbContext { get; } = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     /// <summary>
-    /// Retrieves all entities asynchronously.
+    /// Retrieves all entities asynchronously with optional filtering, ordering, and including related entities.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of all entities.</returns>
-    public async Task<List<TEntity>> GetAllAsync()
-        => await DbContext.Set<TEntity>().AsNoTracking().ToListAsync();
+    /// <param name="includes">A function to include related entities.</param>
+    /// <param name="filter">A filter expression to apply.</param>
+    /// <param name="orderBy">An expression to order the results.</param>
+    /// <param name="ascending">A boolean indicating whether the order should be ascending.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IQueryable of TEntity.</returns>
+    public async Task<IQueryable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>,
+        IIncludableQueryable<TEntity, object>> includes = null!,
+        Expression<Func<TEntity, bool>> filter = null!,
+        Expression<Func<TEntity, object>> orderBy = null!,
+        bool ascending = true)
+    {
+        var query = DbContext.Set<TEntity>().AsNoTracking();
 
-    /// <summary>
-    /// Retrieves all entities that match the specified predicate asynchronously.
-    /// </summary>
-    /// <param name="predicate">The predicate to filter entities.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities that match the predicate.</returns>
-    public async Task<List<TEntity>> GetAllEntitiesAsync(Func<TEntity, bool> predicate)
-        => await Task.FromResult(DbContext.Set<TEntity>().AsNoTracking().Where(predicate).ToList());
+        if (includes != null)
+        {
+            query = includes(query);
+        }
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (orderBy != null)
+        {
+            query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+        }
+
+        return await Task.FromResult(query);
+    }
 
     /// <summary>
     /// Retrieves an entity by its identifier asynchronously.
@@ -72,7 +89,7 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Deletes an existing entity asynchronously.
+    /// Deletes an entity asynchronously.
     /// </summary>
     /// <param name="entity">The entity to delete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
@@ -98,37 +115,22 @@ public class Repository<TEntity, TKey>(DbContext dbContext) : IRepository<TEntit
     }
 
     /// <summary>
-    /// Retrieves a paginated list of entities that match the specified conditions asynchronously.
+    /// Retrieves a paginated result of entities asynchronously.
     /// </summary>
-    /// <param name="includes">A function to include related entities.</param>
-    /// <param name="conditionWhere">The condition to filter entities.</param>
-    /// <param name="orderBy">The expression to order entities.</param>
-    /// <param name="ascending">A value indicating whether to order entities in ascending order.</param>
-    /// <param name="pageIndex">The index of the page to retrieve.</param>
-    /// <param name="pageSize">The size of the page to retrieve.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of paginated entities.</returns>
-    public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
-        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize)
+    /// <param name="query">The query to paginate.</param>
+    /// <param name="pageNumber">The page number to retrieve.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a PaginatedResult of TEntity.</returns>
+    public async Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize)
     {
-        IQueryable<TEntity> query = DbContext.Set<TEntity>();
-
-        query = query.AsNoTracking();
-
-        if (includes != null)
+        var result = new PaginatedResult<TEntity>
         {
-            query = includes(query);
-        }
+            CurrentPage = pageNumber,
+            PageSize = pageSize,
+            TotalItems = await query.CountAsync(),
+            Items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
+        };
 
-        if (conditionWhere != null)
-        {
-            query = query.Where(conditionWhere);
-        }
-
-        if (orderBy != null)
-        {
-            query = query.OrderedByAscending(orderBy, ascending);
-        }
-
-        return query.Page(pageIndex, pageSize).ToListAsync();
+        return result;
     }
 }

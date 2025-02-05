@@ -3,17 +3,16 @@
 public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
 {
     /// <summary>
-    /// Retrieves all entities asynchronously.
+    /// Retrieves all entities asynchronously with optional filtering, ordering, and including related entities.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of all entities.</returns>
-    Task<List<TEntity>> GetAllAsync();
-
-    /// <summary>
-    /// Retrieves all entities that match the specified predicate asynchronously.
-    /// </summary>
-    /// <param name="predicate">The predicate to filter entities.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of entities that match the predicate.</returns>
-    Task<List<TEntity>> GetAllEntitiesAsync(Func<TEntity, bool> predicate);
+    /// <param name="includes">A function to include related entities.</param>
+    /// <param name="filter">A filter expression to apply.</param>
+    /// <param name="orderBy">An expression to order the results.</param>
+    /// <param name="ascending">A boolean indicating whether the order should be ascending.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IQueryable of TEntity.</returns>
+    Task<IQueryable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>,
+        IIncludableQueryable<TEntity, object>> includes = null!, Expression<Func<TEntity, bool>> filter = null!,
+        Expression<Func<TEntity, object>> orderBy = null!, bool ascending = true);
 
     /// <summary>
     /// Retrieves an entity by its identifier asynchronously.
@@ -37,7 +36,7 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     Task UpdateAsync(TEntity entity);
 
     /// <summary>
-    /// Deletes an existing entity asynchronously.
+    /// Deletes an entity asynchronously.
     /// </summary>
     /// <param name="entity">The entity to delete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
@@ -51,15 +50,11 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     Task DeleteByIdAsync(TKey id);
 
     /// <summary>
-    /// Retrieves a paginated list of entities that match the specified conditions asynchronously.
+    /// Retrieves a paginated result of entities asynchronously.
     /// </summary>
-    /// <param name="includes">A function to include related entities.</param>
-    /// <param name="conditionWhere">The condition to filter entities.</param>
-    /// <param name="orderBy">The expression to order entities.</param>
-    /// <param name="ascending">A value indicating whether to order entities in ascending order.</param>
-    /// <param name="pageIndex">The index of the page to retrieve.</param>
-    /// <param name="pageSize">The size of the page to retrieve.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of paginated entities.</returns>
-    public Task<List<TEntity>> GetPaginatedAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes,
-        Expression<Func<TEntity, bool>> conditionWhere, Expression<Func<TEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize);
+    /// <param name="query">The query to paginate.</param>
+    /// <param name="pageNumber">The page number to retrieve.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a PaginatedResult of TEntity.</returns>
+    Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize);
 }
