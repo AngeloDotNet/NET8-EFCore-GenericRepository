@@ -47,24 +47,22 @@ public class YourEntity : IEntity<int>
 ```csharp
 public interface IYourEntityService
 {
-    Task<IEnumerable<YourEntity>> GetAllAsync();
+    Task<IQueryable<YourEntity>> GetAllAsync(Func<IQueryable<YourEntity>,
+        IIncludableQueryable<YourEntity, object>> includes = null!,
+        Expression<Func<YourEntity, bool>> filter = null!,
+        Expression<Func<YourEntity, object>> orderBy = null!,
+        bool ascending = true);
+
     Task<YourEntity> GetByIdAsync(int id);
     Task CreateAsync(YourEntity entity);
     Task UpdateAsync(YourEntity entity);
     Task DeleteAsync(YourEntity entity);
 
-    //Alternative method for extracting all records
-    Task<IEnumerable<YourEntity>> GetAllEntitiesAsync(Func<YourEntity, bool> predicate)
-
     //Alternative method for deleting
     Task DeleteByIdAsync(int id);
 
     //Optional method
-    Task<List<YourEntity>> GetPaginatedAsync(Func<IQueryable<YourEntity>,
-        IIncludableQueryable<YourEntity, object>> includes,
-        Expression<Func<YourEntity, bool>> conditionWhere,
-        Expression<Func<YourEntity, dynamic>> orderBy,
-        bool ascending, int pageIndex, int pageSize);
+    Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize);
 }
 ```
 
@@ -80,7 +78,9 @@ public class YourEntityService : IYourEntityService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<YourEntity>> GetAllAsync()
+    //This method accepts optional lambdas as input (includes, where, order by),
+    //while by default it is sorted in ascending order (set false if you want to sort in descending order)
+    public async Task<IQueryable<TEntity>> GetAllAsync()
     {
         return await _repository.GetAllAsync();
     }
@@ -105,12 +105,6 @@ public class YourEntityService : IYourEntityService
         await _repository.DeleteAsync(entity);
     }
 
-    //Alternative method for extracting all records
-    public async Task<IEnumerable<YourEntity>> GetAllEntitiesAsync(Func<YourEntity, bool> predicate)
-    {
-        return await _repository.GetAllEntitiesAsync(predicate);
-    }
-
     //Alternative method for deleting
     public async Task DeleteByIdAsync(int id)
     {
@@ -118,13 +112,13 @@ public class YourEntityService : IYourEntityService
     }
 
     //Optional method for pagination
-    //If ascending is passed to true, the list is sorted in ascending order.
-    //If ascending is passed to false, the list is sorted in descending order.
-    public Task<List<YourEntity>> GetPaginatedAsync(Func<IQueryable<YourEntity>,
-        IIncludableQueryable<YourEntity, object>> includes, Expression<Func<YourEntity, bool>> conditionWhere,
-        Expression<Func<YourEntity, dynamic>> orderBy, bool ascending, int pageIndex, int pageSize)
+    public async Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize)
     {
-        return await _repository.GetPaginatedAsync(includes, conditionWhere, orderBy, ascending, pageIndex, pageSize);
+        //For optional lambdas read the comments of the GetAllAsync method
+        var query = await repository.GetAllAsync();
+        var result = await repository.GetPaginatedAsync(query, 2, 5);
+
+        return result;
     }
 }
 ```
