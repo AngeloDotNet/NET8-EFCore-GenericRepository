@@ -30,4 +30,12 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\LibraryTools.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
 </Project>
