@@ -57,4 +57,22 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     /// <param name="pageSize">The size of the page.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a PaginatedResult of TEntity.</returns>
     Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize);
+
+    /// <summary>
+    /// Retrieves a paginated result of entities asynchronously with optional filtering, ordering, and including related entities.
+    /// </summary>
+    /// <param name="pageNumber">The page number to retrieve.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="includes">A function to include related entities in the query.</param>
+    /// <param name="filter">A filter expression to apply to the entities.</param>
+    /// <param name="orderBy">An expression to order the results.</param>
+    /// <param name="ascending">A boolean indicating whether the order should be ascending.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a <see cref="PaginatedResult{TEntity}"/>
+    /// with the paginated entities.
+    /// </returns>
+    Task<PaginatedResult<TEntity>> GetAllPagingAsync(int pageNumber, int pageSize,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes = null!,
+        Expression<Func<TEntity, bool>> filter = null!,
+        Expression<Func<TEntity, object>> orderBy = null!, bool ascending = true);
 }
