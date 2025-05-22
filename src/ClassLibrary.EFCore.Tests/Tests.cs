@@ -237,4 +237,21 @@ public class Tests : InMemoryDbContext
         Assert.Equal(10, Assert.IsType<Persone>(entities.Items.First()).Id);
         Assert.Contains(query, x => x.Id == 8);
     }
+
+    [Fact]
+    public async Task GetPagingEntitiesAsync()
+    {
+        using var dbContext = GetDbContext();
+        var repository = new Repository<Persone, int>(dbContext);
+
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        var result = await repository.GetAllPagingAsync(pageNumber: 2, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
+
+        Assert.NotNull(result);
+        Assert.Equal(10, result.TotalItems);
+        Assert.Equal(5, result.Items.Count);
+        Assert.Contains(result.Items, x => x.Id == 8);
+    }
 }
