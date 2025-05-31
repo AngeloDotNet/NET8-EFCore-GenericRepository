@@ -63,6 +63,11 @@ public interface IYourEntityService
 
     //Optional method
     Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize);
+
+    //Optional method for pagination (Prefer this method instead of GetPaginatedAsync)
+    Task<PaginatedResult<TEntity>> GetAllPagingAsync(int pageNumber, int pageSize, Func<IQueryable<TEntity>,
+        IIncludableQueryable<TEntity, object>> includes = null!, Expression<Func<TEntity, bool>> filter = null!,
+        Expression<Func<TEntity, object>> orderBy = null!, bool ascending = true);
 }
 ```
 
@@ -118,12 +123,24 @@ public class YourEntityService : IYourEntityService
     //Example: var query = await repository.GetAllAsync(); var result = await repository.GetPaginatedAsync(query, 1, 10);
     public async Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize)
     {
-        var result = await repository.GetPaginatedAsync(query, pageNumber, pageSize);
+        return await repository.GetPaginatedAsync(query, pageNumber, pageSize);
+    }
 
-        return result;
+    //Optional method for pagination (Prefer this method instead of GetPaginatedAsync)
+    public async Task<PaginatedResult<TEntity>> GetAllPagingAsync(int pageNumber, int pageSize, Func<IQueryable<TEntity>,
+        IIncludableQueryable<TEntity, object>> includes = null!, Expression<Func<TEntity, bool>> filter = null!,
+        Expression<Func<TEntity, object>> orderBy = null!, bool ascending = true)
+    {
+        return await repository.await repository.GetAllPagingAsync(pageNumber: 2, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
     }
 }
 ```
+
+<!--
+## Test results
+
+![Test Results](your_image_link_here)
+-->
 
 ## Contributing
 
