@@ -171,33 +171,36 @@ public class Tests : InMemoryDbContext
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
-        var entities = await repository.GetPaginatedAsync(query, 2, 5);
+        //var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
+        //var entities = await repository.GetPaginatedAsync(query, 2, 5);
+
+        var entities = await repository.GetAllPagingAsync(pageNumber: 2, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
         var itemCount = entities.Items.Count;
 
         Assert.NotNull(entities);
         Assert.Equal(5, itemCount);
-        Assert.Contains(query, x => x.Id == 8);
+        Assert.Contains(entities.Items, x => x.Id == 8);
     }
 
-    [Fact]
-    public async Task GetPaginatedEntitiesWithoutIncludeAsync()
-    {
-        using var dbContext = GetDbContext();
-        var repository = new Repository<Persone, int>(dbContext);
+    //[Fact]
+    //public async Task GetPaginatedEntitiesWithoutIncludeAsync()
+    //{
+    //    using var dbContext = GetDbContext();
+    //    var repository = new Repository<Persone, int>(dbContext);
 
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.EnsureCreatedAsync();
+    //    await dbContext.Database.EnsureDeletedAsync();
+    //    await dbContext.Database.EnsureCreatedAsync();
 
-        var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
+    //    //var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
+    //    //var entities = await repository.GetPaginatedAsync(query, 2, 5);
 
-        var entities = await repository.GetPaginatedAsync(query, 2, 5);
-        var itemCount = entities.Items.Count;
+    //    var entities = await repository.GetAllPagingAsync(pageNumber: 2, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), filter: w => w.Id <= 10);
+    //    var itemCount = entities.Items.Count;
 
-        Assert.NotNull(entities);
-        Assert.Equal(5, itemCount);
-        Assert.Contains(query, x => x.Id == 8);
-    }
+    //    Assert.NotNull(entities);
+    //    Assert.Equal(5, itemCount);
+    //    Assert.Contains(entities.Items, x => x.Id == 8);
+    //}
 
     [Fact]
     public async Task GetPaginatedEntitiesWithoutWhereAsync()
@@ -208,14 +211,15 @@ public class Tests : InMemoryDbContext
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: null!, orderBy: x => x.Id);
+        //var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: null!, orderBy: x => x.Id);
+        //var entities = await repository.GetPaginatedAsync(query, 1, 5);
 
-        var entities = await repository.GetPaginatedAsync(query, 1, 5);
+        var entities = await repository.GetAllPagingAsync(pageNumber: 1, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), orderBy: x => x.Id);
         var itemCount = entities.Items.Count;
 
         Assert.NotNull(entities);
         Assert.Equal(5, itemCount);
-        Assert.Contains(query, x => x.Id == 3);
+        Assert.Contains(entities.Items, x => x.Id == 3);
     }
 
     [Fact]
@@ -227,15 +231,17 @@ public class Tests : InMemoryDbContext
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: null!, orderBy: x => x.Id, ascending: false);
+        //var query = await repository.GetAllAsync(includes: q => q.Include(p => p.Indirizzo), filter: null!, orderBy: x => x.Id, ascending: false);
+        //var entities = await repository.GetPaginatedAsync(query, 1, 5);
 
-        var entities = await repository.GetPaginatedAsync(query, 1, 5);
+        var entities = await repository.GetAllPagingAsync(pageNumber: 1, pageSize: 5, includes: q => q.Include(p => p.Indirizzo), orderBy: x => x.Id, ascending: false);
         var itemCount = entities.Items.Count;
 
         Assert.NotNull(entities);
         Assert.Equal(5, itemCount);
         Assert.Equal(10, Assert.IsType<Persone>(entities.Items.First()).Id);
-        Assert.Contains(query, x => x.Id == 8);
+        //Assert.Contains(query, x => x.Id == 8);
+        Assert.Contains(entities.Items, x => x.Id == 8);
     }
 
     [Fact]
