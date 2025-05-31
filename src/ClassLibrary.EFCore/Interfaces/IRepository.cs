@@ -56,6 +56,7 @@ public interface IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     /// <param name="pageNumber">The page number to retrieve.</param>
     /// <param name="pageSize">The size of the page.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a PaginatedResult of TEntity.</returns>
+    [Obsolete(message: "Use GetAllPagingAsync instead. This method will be removed in a future version.", error: false)]
     Task<PaginatedResult<TEntity>> GetPaginatedAsync(IQueryable<TEntity> query, int pageNumber, int pageSize);
 
     /// <summary>
