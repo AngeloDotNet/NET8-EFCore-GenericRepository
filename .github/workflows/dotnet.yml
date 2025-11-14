@@ -59,5 +59,6 @@ jobs:
       with:
           tag_name: ${{ env.TAG_NAME }}_v${{ steps.nbgv.outputs.NuGetPackageVersion }}
           release_name: ${{ env.RELEASE_NAME }} ${{ steps.nbgv.outputs.NuGetPackageVersion }}
+          body: Collection of a generic implementation of Entity Framework Core for .NET 8 mostly used in my private and/or work projects thus avoiding the duplication of repetitive code.
           draft: false
           prerelease: false
